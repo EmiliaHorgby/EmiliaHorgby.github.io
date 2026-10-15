@@ -1,12 +1,26 @@
 <!DOCTYPE html>
 <html>
+
 <head>
-<title>Page Title</title>
+    <title>WOOP WOOP IT'S THA SOUND OF THA SCHNEGEL</title>
 </head>
+
 <body>
-
-<h1>This is a Heading</h1>
-<p>This is a paragraph.</p>
-
+    <h1>WOOP WOOP IT'S THA SOUND OF THA SCHNEGEL</h1>
+    <p>This is a paragraph.</p>
+    <div id="entry"></div>
+    <script src="./grecha.js"></script>
+    <script>
+      const image = img("test.jpg");
+      
+      const r = router({
+        "/": () => div(
+          h1("Grecha.js"),
+          div(image),
+        )
+      });
+      entry.appendChild(r);
+    </script>
 </body>
+
 </html>
