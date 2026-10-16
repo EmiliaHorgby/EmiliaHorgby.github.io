@@ -60,14 +60,16 @@ Olivec_Canvas vc_render(float dt) {
         continue;
       // should include dx and dy, and should only flip the values if they are
       // not already going away from each other
-      float distance = sqrtf(sqrf(xs[i] - xs[j]) +
-                             sqrf(ys[i] - ys[j]));
+      float distance = sqrtf(sqrf(xs[i] - xs[j]) + sqrf(ys[i] - ys[j]));
       if (distance < 2 * CIRCLE_RADIUS) {
-        if (OLIVEC_SIGN(float, xs[i] - xs[j]) * OLIVEC_SIGN(float, dxs[i] - dxs[j]) == -1)
-            OLIVEC_SWAP(float, dxs[i], dxs[j]);
-        
-         if (OLIVEC_SIGN(float, ys[i] - ys[j]) * OLIVEC_SIGN(float, dys[i] - dys[j]) == -1)
-            OLIVEC_SWAP(float, dys[i], dys[j]);
+        int approach = OLIVEC_SIGN(float, xs[i] - xs[j]) *
+                       OLIVEC_SIGN(float, dxs[i] - dxs[j]);
+        if (approach == -1)
+          OLIVEC_SWAP(float, dxs[i], dxs[j]);
+        approach = OLIVEC_SIGN(float, ys[i] - ys[j]) *
+                   OLIVEC_SIGN(float, dys[i] - dys[j]);
+        if (approach == -1)
+          OLIVEC_SWAP(float, dys[i], dys[j]);
       }
     }
 
