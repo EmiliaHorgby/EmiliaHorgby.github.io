@@ -1,48 +1,73 @@
-#include "./olive.c/demos/vc.c"
+#include "../olive.c/demos/vc.c"
+#include <stdint.h>
 
 #define WIDTH 960
 #define HEIGHT 720
 #define BACKGROUND_COLOR 0xFF181818
 #define CIRCLE_RADIUS 100
-#define CIRCLE_COLOR 0x99AA2020
 
 static uint32_t pixels[WIDTH*HEIGHT];
-static float triangle_angle = 0;
-static float circle_x = WIDTH/2;
-static float circle_y = HEIGHT/2;
-static float circle_dx = 100;
-static float circle_dy = 100;
+
+
+static float xs[] = {100, 300, 500};
+static float ys[] = {100, 300, 500};
+static float dxs[] = {10, 8, 5};
+static float dys[] = {7, 10, 6};
+static uint32_t colors[] = {0xff15638f, 0xff8f1915, 0xff51158f};
 
 float sqrtf(float x);
 float atan2f(float y, float x);
 float sinf(float x);
 float cosf(float x);
+float acosf(float x);
 
 #define PI 3.14159265359
 
-static inline void rotate_point(float *x, float *y)
-{
-    float dx = *x - WIDTH/2;
-    float dy = *y - HEIGHT/2;
-    float mag = sqrtf(dx*dx + dy*dy);
-    float dir = atan2f(dy, dx) + triangle_angle;
-    *x = cosf(dir)*mag + WIDTH/2;
-    *y = sinf(dir)*mag + HEIGHT/2;
+float sqrf(float x) {
+    return x*x;
 }
 
+float correct_d(float x, float dx, float dt, float border){
+    float perimeter = x + dx*dt;
+    int cond = (perimeter - CIRCLE_RADIUS < 0 || perimeter + CIRCLE_RADIUS >= border);
+    return (1-2*cond) * dx;
+}
+
+void wall_bounce(int i, float dt){
+    dxs[i] = correct_d(xs[i], dxs[i], dt, WIDTH);
+    xs[i] = xs[i] + dxs[i];
+    dys[i] = correct_d(ys[i], dys[i], dt, HEIGHT);
+    ys[i] = ys[i] + dys[i];
+}
+
+void swap(float *a, float *b) {
+    int temp = *a;
+    *a = *b;
+    *b = temp;
+}
 
 Olivec_Canvas vc_render(float dt)
 {
-    
-    
     Olivec_Canvas oc = olivec_canvas(pixels, WIDTH, HEIGHT, WIDTH);
 
     olivec_fill(oc, BACKGROUND_COLOR);
 
-    // Circle
     
-    olivec_circle(oc, 100., 100., CIRCLE_RADIUS, CIRCLE_COLOR);
+    // Circle
+    int n = *(&xs + 1) - xs;
+    for (int i = 0; i < n; i++) {
+        wall_bounce(i, dt);
+        
+        for (int j = 0; j < n; j++) {
+            if (i == j) continue;
+            float distance = sqrtf(sqrf(xs[i] - xs[j]) + sqrf(ys[i] - ys[j]));
+            if (distance < 2*CIRCLE_RADIUS) {
+               swap(&dxs[i], &dxs[j]);
+               swap(&dys[i], &dys[j]);
+            }
+        }
 
-
+        olivec_circle(oc, xs[i], ys[i], CIRCLE_RADIUS, colors[i]);
+    }
     return oc;
 }
