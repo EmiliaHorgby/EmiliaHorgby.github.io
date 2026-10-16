@@ -13,7 +13,7 @@ bool build_wasm_demo(Cmd *cmd, Procs *procs, const char *name) {
       "--no-standard-libraries", "-Wl,--no-entry", "-Wl,--export=vc_render",
       "-Wl,--export=__heap_base", "-Wl,--allow-undefined", "-o",
       temp_sprintf("./build/demos/%s.wasm", name),
-      "-DVC_PLATFORM=VC_WASM_PLATFORM", temp_sprintf("./demos/%s.c", name));
+      "-DVC_PLATFORM=VC_WASM_PLATFORM", temp_sprintf("./%s.c", name));
   return cmd_run(cmd, .async = procs);
 }
 
