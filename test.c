@@ -62,12 +62,27 @@ Olivec_Canvas vc_render(float dt) {
       // not already going away from each other
       float distance = sqrtf(sqrf(xs[i] - xs[j]) + sqrf(ys[i] - ys[j]));
       if (distance < 2 * CIRCLE_RADIUS) {
-        int approach = OLIVEC_SIGN(float, xs[i] - xs[j]) *
-                       OLIVEC_SIGN(float, dxs[i] - dxs[j]);
+        float ldx = xs[i] - xs[j];
+        float rdx = dxs[i] - dxs[j];
+        
+        if (OLIVEC_ABS(float, rdx) < 0.1) {
+          dxs[i] = OLIVEC_SIGN(float, ldx) * 0.1;
+          dxs[j] = -OLIVEC_SIGN(float, ldx) * 0.1;
+        }
+
+        int approach = OLIVEC_SIGN(float, ldx) * OLIVEC_SIGN(float, rdx);
+        
         if (approach == -1)
           OLIVEC_SWAP(float, dxs[i], dxs[j]);
-        approach = OLIVEC_SIGN(float, ys[i] - ys[j]) *
-                   OLIVEC_SIGN(float, dys[i] - dys[j]);
+
+        float ldy = ys[i] - ys[j];
+        float rdy = dys[i] - dys[j];
+        if (OLIVEC_ABS(float, rdy) < 0.1) {
+          dys[i] = OLIVEC_SIGN(float, ldy) * 0.1;
+          dys[j] = -OLIVEC_SIGN(float, ldy) * 0.1;
+        }
+
+        approach = OLIVEC_SIGN(float, ldy) * OLIVEC_SIGN(float, rdy);
         if (approach == -1)
           OLIVEC_SWAP(float, dys[i], dys[j]);
       }
