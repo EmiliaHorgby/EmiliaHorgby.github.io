@@ -1,4 +1,4 @@
-#include "/home/gadus/programming-projects/pages/olive.c/demos/vc.c"
+#include "./olive.c/demos/vc.c"
 
 #define WIDTH 960
 #define HEIGHT 720
