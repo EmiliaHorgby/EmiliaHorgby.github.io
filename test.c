@@ -1,20 +1,20 @@
-#include "olive.c/demos/vc.c"
 #include <stdint.h>
+
+#include "olive.c/demos/vc.c"
 
 #define WIDTH 960
 #define HEIGHT 720
 #define BACKGROUND_COLOR 0xFF181818
 #define CIRCLE_RADIUS 100
+#define N_BALLS 5
 
 static uint32_t pixels[WIDTH * HEIGHT];
 
-static float xs[] = {100, 300, 500};
-static float ys[] = {100, 300, 500};
-static float dxs[] = {10, 8, 5};
-static float dys[] = {7, 10, 6};
-static uint32_t colors[] = {OLIVEC_RGBA(143, 99, 21, 255),
-                            OLIVEC_RGBA(21, 25, 143, 255),
-                            OLIVEC_RGBA(143, 21, 81, 255)};
+static float xs[N_BALLS] = {800, 300, 300, 40, 700};
+static float ys[N_BALLS] = {200, 100, 400, 70, 90};
+static float dxs[N_BALLS] = {10, 5, 1, 15, 9};
+static float dys[N_BALLS] = {2, 10, 6, 3, 1};
+static float sizes[N_BALLS] = {100, 20, 50, 20, 15};
 
 float sqrtf(float x);
 float atan2f(float y, float x);
@@ -26,69 +26,87 @@ float acosf(float x);
 
 float sqrf(float x) { return x * x; }
 
-float correct_d(float x, float dx, float dt, float border) {
-  float perimeter = x + dx * dt;
-  // if there not allready outside the bounds, then make sure they go back
-  if (perimeter - CIRCLE_RADIUS < 0) {
-    return OLIVEC_ABS(float, dx);
-  }
-  if (perimeter + CIRCLE_RADIUS >= border) {
-    return -OLIVEC_ABS(float, dx);
-  }
-  return dx;
+
+float correct_d(float x, float dx, float dt, float r, float border) {
+   float perimeter = x + dx * dt;
+   // if there not allready outside the bounds, then make sure they go back
+   if (perimeter - r < 0) {
+      return OLIVEC_ABS(float, dx);
+   }
+   if (perimeter + r >= border) {
+      return -OLIVEC_ABS(float, dx);
+   }
+   return dx;
 }
 
 void wall_bounce(int i, float dt) {
-  dxs[i] = correct_d(xs[i], dxs[i], dt, WIDTH);
-  xs[i] = xs[i] + dxs[i];
-  dys[i] = correct_d(ys[i], dys[i], dt, HEIGHT);
-  ys[i] = ys[i] + dys[i];
+   dxs[i] = correct_d(xs[i], dxs[i], dt, sizes[i], WIDTH);
+   xs[i] = xs[i] + dxs[i];
+   dys[i] = correct_d(ys[i], dys[i], dt, sizes[i], HEIGHT);
+   ys[i] = ys[i] + dys[i];
+}
+
+float euclidean(float x, float y) { return sqrtf(sqrf(x) + sqrf(y)); }
+void ball_bounce(int i, int j) {
+   // should include dx and dy, and should only flip the values if they
+   // are not already going away from each other
+   float distance = euclidean(xs[i] - xs[j], ys[i] - ys[j]);
+   if (distance < sizes[i] + sizes[j]) {
+      float mass_i = sqrf(sizes[i]);
+      float mass_j = sqrf(sizes[j]);
+      float prop_mass_i = mass_i / (mass_i + mass_j);
+      float prop_mass_j = mass_j / (mass_i + mass_j);
+
+      float ldx = xs[i] - xs[j];
+      float rdx = dxs[i] - dxs[j];
+      float ldy = ys[i] - ys[j];
+      float rdy = dys[i] - dys[j];
+      float common_factor = (ldx * rdx + ldy * rdy) / sqrf(distance);
+
+      // Avoids the balls getting stuck in each other
+      if (OLIVEC_ABS(float, rdx) < 0.1) {
+         dxs[i] = OLIVEC_SIGN(float, ldx) * 0.1;
+         dxs[j] = -OLIVEC_SIGN(float, ldx) * 0.1;
+      }
+
+      int approach = OLIVEC_SIGN(float, ldx) * OLIVEC_SIGN(float, rdx);
+      if (approach == -1) {
+         dxs[i] -= 2 * prop_mass_j * ldx * common_factor;
+         dxs[j] += 2 * prop_mass_i * ldx * common_factor;
+      }
+
+      // Avoids the balls getting stuck in each other
+      if (OLIVEC_ABS(float, rdy) < 0.1) {
+         dys[i] = OLIVEC_SIGN(float, ldy) * 0.1;
+         dys[j] = -OLIVEC_SIGN(float, ldy) * 0.1;
+      }
+
+      approach = OLIVEC_SIGN(float, ldy) * OLIVEC_SIGN(float, rdy);
+      if (approach == -1) {
+         dys[i] -= 2 * prop_mass_j * ldy * common_factor;
+         dys[j] += 2 * prop_mass_i * ldy * common_factor;
+      }
+   }
+}
+
+uint32_t rainbow(float x) {
+   int r = 255 * (sinf(360 * x / (2 * N_BALLS)) + 1)/2;
+   int g = 255 * (sinf(360 * x / (2 * N_BALLS) + 2 * PI / 3) +1) /2;
+   int b = 255 * (sinf(360 * x / (2 * N_BALLS) + 4 * PI / 3) + 1) /2;
+   return OLIVEC_RGBA(r, g, b, 255);
 }
 
 Olivec_Canvas vc_render(float dt) {
-  Olivec_Canvas oc = olivec_canvas(pixels, WIDTH, HEIGHT, WIDTH);
+   Olivec_Canvas oc = olivec_canvas(pixels, WIDTH, HEIGHT, WIDTH);
 
-  olivec_fill(oc, BACKGROUND_COLOR);
-
-  // Circle
-  int n = *(&xs + 1) - xs;
-  for (int i = 0; i < n; i++) {
-    wall_bounce(i, dt);
-
-    for (int j = 0; j < n; j++) {
-      if (i == j)
-        continue;
-      // should include dx and dy, and should only flip the values if they are
-      // not already going away from each other
-      float distance = sqrtf(sqrf(xs[i] - xs[j]) + sqrf(ys[i] - ys[j]));
-      if (distance < 2 * CIRCLE_RADIUS) {
-        float ldx = xs[i] - xs[j];
-        float rdx = dxs[i] - dxs[j];
-        
-        if (OLIVEC_ABS(float, rdx) < 0.1) {
-          dxs[i] = OLIVEC_SIGN(float, ldx) * 0.1;
-          dxs[j] = -OLIVEC_SIGN(float, ldx) * 0.1;
-        }
-
-        int approach = OLIVEC_SIGN(float, ldx) * OLIVEC_SIGN(float, rdx);
-        
-        if (approach == -1)
-          OLIVEC_SWAP(float, dxs[i], dxs[j]);
-
-        float ldy = ys[i] - ys[j];
-        float rdy = dys[i] - dys[j];
-        if (OLIVEC_ABS(float, rdy) < 0.1) {
-          dys[i] = OLIVEC_SIGN(float, ldy) * 0.1;
-          dys[j] = -OLIVEC_SIGN(float, ldy) * 0.1;
-        }
-
-        approach = OLIVEC_SIGN(float, ldy) * OLIVEC_SIGN(float, rdy);
-        if (approach == -1)
-          OLIVEC_SWAP(float, dys[i], dys[j]);
+   olivec_fill(oc, BACKGROUND_COLOR);
+   float vals[] = {0, 0.2, 0.4, 0.8, 1};
+   for (int i = 0; i < N_BALLS; i++) {
+      wall_bounce(i, dt);
+      for (int j = 0; j < i; j++) {
+         ball_bounce(i, j);
       }
-    }
-
-    olivec_circle(oc, xs[i], ys[i], CIRCLE_RADIUS, colors[i]);
-  }
-  return oc;
+      olivec_circle(oc, xs[i], ys[i], sizes[i], rainbow(vals[i]));
+   }
+   return oc;
 }

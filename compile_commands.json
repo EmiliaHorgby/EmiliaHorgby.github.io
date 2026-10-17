@@ -1,0 +1,7 @@
+[
+    { "directory": "./",
+      "arguments": ["clang", "-Wall", "-Wextra", "-pedantic", "-ggdb", "-I.", "-I./build/", "-I./dev-deps/", "-O2", "-fno-builtin", "--target=wasm32",
+      "--no-standard-libraries", "-Wl,--no-entry", "-Wl,--export=vc_render",
+      "-Wl,--export=__heap_base", "-Wl,--allow-undefined", "-o","./build/demos/test.wasm", "-DVC_PLATFORM=VC_WASM_PLATFORM", "./test.c"],
+      "file" : "test.c"}
+]
