@@ -65,8 +65,8 @@ void ball_bounce(int i, int j) {
 
       // Avoids the balls getting stuck in each other
       if (OLIVEC_ABS(float, rdx) < 0.1) {
-         dxs[i] = OLIVEC_SIGN(float, ldx) * 0.1;
-         dxs[j] = -OLIVEC_SIGN(float, ldx) * 0.1;
+         dxs[i] = -OLIVEC_SIGN(float, ldx) * 0.1;
+         dxs[j] = OLIVEC_SIGN(float, ldx) * 0.1;
       }
 
       int approach = OLIVEC_SIGN(float, ldx) * OLIVEC_SIGN(float, rdx);
@@ -76,9 +76,9 @@ void ball_bounce(int i, int j) {
       }
 
       // Avoids the balls getting stuck in each other
-      if (OLIVEC_ABS(float, rdy) < 0.1) {
-         dys[i] = OLIVEC_SIGN(float, ldy) * 0.1;
-         dys[j] = -OLIVEC_SIGN(float, ldy) * 0.1;
+      if (OLIVEC_ABS(float, rdy) < 0.3) {
+         dys[i] = OLIVEC_SIGN(float, ldy) * 0.3;
+         dys[j] = -OLIVEC_SIGN(float, ldy) * 0.3;
       }
 
       approach = OLIVEC_SIGN(float, ldy) * OLIVEC_SIGN(float, rdy);
@@ -96,11 +96,14 @@ uint32_t rainbow(float x) {
    return OLIVEC_RGBA(r, g, b, 255);
 }
 
+static float momentum = -1;
 Olivec_Canvas vc_render(float dt) {
-   Olivec_Canvas oc = olivec_canvas(pixels, WIDTH, HEIGHT, WIDTH);
 
-   olivec_fill(oc, BACKGROUND_COLOR);
+   float current_momentum = 0;
    float vals[] = {0, 0.2, 0.4, 0.8, 1};
+   Olivec_Canvas oc = olivec_canvas(pixels, WIDTH, HEIGHT, WIDTH);
+   olivec_fill(oc, BACKGROUND_COLOR);
+
    for (int i = 0; i < N_BALLS; i++) {
       wall_bounce(i, dt);
       for (int j = 0; j < i; j++) {
