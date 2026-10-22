@@ -45,8 +45,126 @@
 -->
 <!DOCTYPE html>
 <html>
-  <body>
-    <script src="fractal.js"></script>
-  </body>
+<title>Emilia's Blog... or something.</title>
+
+<head>
+  <style>
+    body {
+      background-color: rgb(40, 40, 40);
+    }
+
+    h1 {
+      color: rgb(212, 212, 212);
+    }
+
+    h2 {
+      color: rgb(212, 212, 212);
+    }
+
+    p {
+      color: rgb(212, 212, 212);
+    }
+  </style>
+</head>
+
+<body>
+  <h1> This just me playing around with making a website </h1>
+  <p>
+    I am a recently graduated marine biologist with an interest in population modeling and computer science.
+    This page is (planned to be) an unsorted selection of my projects, with no weight given to the seriousness of the
+    project. Note that some work is still needed on the layout of the website, so forgive that for being a bit janky. 
+  </p>
+  <div id="sec-test">
+    <h2>Balls Bouncing demo</h2>
+    <p>
+      In no way perfect, as it definitely looses energy over time due to faulty physics interactions, we can call it
+      air resistance. I wrote the simulation just to test coding for the web for the first time. The simulation is
+      written in C using Web Assembly, using a simple graphics library called olive.c as the backend.
+    </p>
+    <canvas id="app-test"></canvas>
+  </div>
+  <script src="olive.c/js/vc.js"></script>
+  <script>
+    startDemo("test", "./wasm/test.wasm");
+  </script>
+  <h2> Julia Set Demo</h2>
+  <p>
+    A julia set demo showing the argument of the number each point in the complex plain approaches, when the equation
+    <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+      <semantics>
+        <mrow>
+          <msub>
+            <mi>z</mi>
+            <mrow>
+              <mi>n</mi>
+              <mo>+</mo>
+              <mn>1</mn>
+            </mrow>
+          </msub>
+          <mo>=</mo>
+          <msup>
+            <msub>
+              <mi>z</mi>
+              <mi>n</mi>
+            </msub>
+            <mn>2</mn>
+          </msup>
+          <mo>+</mo>
+          <msub>
+            <mi>z</mi>
+            <mrow>
+              <mi>m</mi>
+              <mi>o</mi>
+              <mi>u</mi>
+              <mi>s</mi>
+              <mi>e</mi>
+            </mrow>
+          </msub>
+        </mrow>
+        <annotation encoding="application/x-tex">z_{n+1} = {z_n}^2 + z_{mouse}</annotation>
+      </semantics>
+    </math>
+    is iterated, starting at 
+    <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+      <semantics>
+        <mrow>
+          <msub>
+            <mi>z</mi>
+            <mrow>
+              <mi>1</mi>
+            </mrow>
+          </msub>
+          <mo>=</mo>
+          <msup>
+            0
+          </msup>
+        </mrow>
+        <annotation encoding="application/x-tex">z_{1} = 0</annotation>
+      </semantics>
+    </math>
+    ,where 
+    <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+      <semantics>
+        <mrow>
+        <msub>
+            <mi>z</mi>
+            <mrow>
+              <mi>m</mi>
+              <mi>o</mi>
+              <mi>u</mi>
+              <mi>s</mi>
+              <mi>e</mi>
+            </mrow>
+          </msub>
+        </mrow>
+        <annotation encoding="application/x-tex">z_{mouse}</annotation>
+      </semantics>
+    </math> is the location of the mouse cursor, as a complex number. 
+    The demo is written using JavaScript and WebGL, allowing the GPU to do the heavy lifting.   
+  </p>
+  <script src="./fractal.js"></script>
+</body>
+
 </html>
+
 </html>
