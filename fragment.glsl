@@ -7,6 +7,7 @@ uniform vec2 u_mouse;
 float atan2(float x, float y){
     return 2.0 * atan(y / (sqrt(y*y + x*x) + x));
 }
+
 vec3 julia(vec2 z, vec2 c) {
     float angle;
     for (int i = 0; i < int(ITER); i++) {
