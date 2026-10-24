@@ -23,11 +23,12 @@
 </head>
 
 <body>
+
   <h1> This just me playing around with making a website </h1>
   <p>
     I am a recently graduated marine biologist with an interest in population modeling and computer science.
     This page is (planned to be) an unsorted selection of my projects, with no weight given to the seriousness of the
-    project. Note that some work is still needed on the layout of the website, so forgive that for being a bit janky. 
+    project. Note that some work is still needed on the layout of the website, so forgive that for being a bit janky.
   </p>
   <div id="sec-test">
     <h2>Balls Bouncing demo</h2>
@@ -38,13 +39,14 @@
     </p>
     <canvas id="app-test"></canvas>
   </div>
-  <script src="olive.c/js/vc.js"></script>
+  <script src="./bouncing_balls/olive.c/js/vc.js"></script>
   <script>
-    startDemo("test", "./wasm/test.wasm");
+    startDemo("test", "./bouncing_balls/wasm/test.wasm");
   </script>
   <h2> Julia Set Demo</h2>
   <p>
-    A julia set demo showing the argument of the number each point in the complex plain approaches, as a color of the rainbow, when the equation
+    A julia set demo showing the argument of the number each point in the complex plain approaches, as a color of the
+    rainbow, when the equation
     <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
       <semantics>
         <mrow>
@@ -79,7 +81,7 @@
         <annotation encoding="application/x-tex">z_{n+1} = {z_n}^2 + z_{mouse}</annotation>
       </semantics>
     </math>
-    is iterated, where 
+    is iterated, where
     <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
       <semantics>
         <mrow>
@@ -92,11 +94,12 @@
         </mrow>
         <annotation encoding="application/x-tex">z_{1}</annotation>
       </semantics>
-    </math> starts at a different value for each pixel, with the pixels value being its scaled location as a complex number. 
+    </math> starts at a different value for each pixel, with the pixels value being its scaled location as a complex
+    number.
     <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
       <semantics>
         <mrow>
-        <msub>
+          <msub>
             <mi>z</mi>
             <mrow>
               <mi>m</mi>
@@ -109,10 +112,19 @@
         </mrow>
         <annotation encoding="application/x-tex">z_{mouse}</annotation>
       </semantics>
-    </math> is the location of the mouse cursor, as a complex number. 
-    The demo is written using JavaScript and WebGL, allowing the GPU to do the heavy lifting.   
+    </math> is the location of the mouse cursor, as a complex number.
+    The demo is written using JavaScript and WebGL, allowing the GPU to do the heavy lifting.
   </p>
-  <script src="./fractal.js"></script>
+
+  <script type="module">
+    import { main } from "./fractal/fractal_backend.mjs";
+    main("colored_argument.glsl");
+  </script>
+  <p>An alternative version is shown bellow this, that does not use the argument of the final value, and instead used the time a the pixel takes to diverge to assign a color.</p>
+  <script type="module">
+    import { main } from "./fractal/fractal_backend.mjs";
+    main("glow.glsl");
+  </script>
 </body>
 
 </html>
